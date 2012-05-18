@@ -86,8 +86,11 @@ class TestOAuthFullStack(ManagerTester):
         o_req = oauth.Request.from_consumer_and_token(consumer, token=None,
             http_method='GET', http_url='http://localhost/secret-for-all')
         o_req.sign_request(oauth.SignatureMethod_HMAC_SHA1(), consumer, None)
-
-        res = app.get(o_req.url, expect_errors=True, headers=o_req.to_header())
+        
+        request_header = o_req.to_header()
+        request_header['Authorization'] = str(request_header['Authorization'])
+        
+        res = app.get(o_req.url, expect_errors=True, headers=request_header)
         # Still no go
         self.assertTrue('401 Unauthorized' in res)
 
@@ -98,7 +101,7 @@ class TestOAuthFullStack(ManagerTester):
         self.assertEquals(self.plugin.manager.get_consumer_by_key('app').key,
             consumer.key)
 
-        res = app.get(o_req.url, headers=o_req.to_header())
+        res = app.get(o_req.url, headers=request_header)
         # Here we go - the resource we wanted so much
         self.assertTrue('This is a secret for all to see' in res)
 
@@ -106,7 +109,11 @@ class TestOAuthFullStack(ManagerTester):
         o_req = oauth.Request.from_consumer_and_token(consumer, token=None,
             http_method='GET', http_url='http://localhost/secret-for-app1')
         o_req.sign_request(oauth.SignatureMethod_HMAC_SHA1(), consumer, None)
-        res = app.get(o_req.url, expect_errors=True, headers=o_req.to_header())
+        
+        request_header = o_req.to_header()
+        request_header['Authorization'] = str(request_header['Authorization'])
+        
+        res = app.get(o_req.url, expect_errors=True, headers=request_header)
         self.assertTrue('401 Unauthorized' in res)
 
         # So that means we need another consumer
@@ -123,7 +130,11 @@ class TestOAuthFullStack(ManagerTester):
         o_req = oauth.Request.from_consumer_and_token(consumer1, token=None,
             http_method='GET', http_url='http://localhost/secret-for-app1')
         o_req.sign_request(oauth.SignatureMethod_HMAC_SHA1(), consumer1, None)
-        res = app.get(o_req.url, expect_errors=True, headers=o_req.to_header())
+        
+        request_header = o_req.to_header()
+        request_header['Authorization'] = str(request_header['Authorization'])
+        
+        res = app.get(o_req.url, expect_errors=True, headers=request_header)
         self.assertTrue('401 Unauthorized' in res)
 
         # What's wrong? Oh, the secret!
@@ -131,7 +142,11 @@ class TestOAuthFullStack(ManagerTester):
         o_req = oauth.Request.from_consumer_and_token(consumer1, token=None,
             http_method='GET', http_url='http://localhost/secret-for-app1')
         o_req.sign_request(oauth.SignatureMethod_HMAC_SHA1(), consumer1, None)
-        res = app.get(o_req.url, headers=o_req.to_header())
+        
+        request_header = o_req.to_header()
+        request_header['Authorization'] = str(request_header['Authorization'])
+        
+        res = app.get(o_req.url, headers=request_header)
         self.assertTrue('This is a secret for app1 only' in res)
 
         # We should not be able to access not_oauth protected resource neither
@@ -139,14 +154,22 @@ class TestOAuthFullStack(ManagerTester):
         o_req = oauth.Request.from_consumer_and_token(consumer1, token=None,
             http_method='GET', http_url='http://localhost/secret-for-others')
         o_req.sign_request(oauth.SignatureMethod_HMAC_SHA1(), consumer1, None)
-        res = app.get(o_req.url, expect_errors=True, headers=o_req.to_header())
+        
+        request_header = o_req.to_header()
+        request_header['Authorization'] = str(request_header['Authorization'])
+        
+        res = app.get(o_req.url, expect_errors=True, headers=request_header)
         self.assertTrue('401 Unauthorized' in res)
 
         # nor with consumer...
         o_req = oauth.Request.from_consumer_and_token(consumer, token=None,
             http_method='GET', http_url='http://localhost/secret-for-others')
         o_req.sign_request(oauth.SignatureMethod_HMAC_SHA1(), consumer, None)
-        res = app.get(o_req.url, expect_errors=True, headers=o_req.to_header())
+        
+        request_header = o_req.to_header()
+        request_header['Authorization'] = str(request_header['Authorization'])
+        
+        res = app.get(o_req.url, expect_errors=True, headers=request_header)
         self.assertTrue('401 Unauthorized' in res)
 
         # However, a simple unauthenticated request will do
