@@ -118,13 +118,13 @@ class token_authorization(Predicate):
     instruct the user to provide the verification code to the client
     application as needed.
 
-    token_authorization takes an SQLAlchemy engine (or engine uri string) and
-    repoze.who oauth manager as its initialization parameters.
+    token_authorization takes a repoze.who oauth manager and SQLAlchemy engine
+    (or engine uri string) as its initialization parameters.
     """
     message = u'No valid matching OAuth token found'
 
-    def __init__(self, engine, Manager=DefaultManager):
-        self.engine = engine
+    def __init__(self, Manager=DefaultManager, **kwargs):
+        self.kwargs = kwargs
         self.Manager = Manager
 
     @property
@@ -132,7 +132,7 @@ class token_authorization(Predicate):
         # If we have the manager cached then use it. Otherwise create it, cache
         # it and use it
         if not hasattr(self, '_manager'):
-            self._manager = self.Manager(self.engine)
+            self._manager = self.Manager(**self.kwargs)
         return self._manager
 
     def _make_callback(self):
