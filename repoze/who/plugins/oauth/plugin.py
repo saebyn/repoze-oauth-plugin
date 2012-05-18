@@ -33,11 +33,12 @@ class OAuthPlugin(object):
     # This plugin is an identifier, authenticator and challenger
     implements(IIdentifier, IAuthenticator, IChallenger)
 
-    def __init__(self, engine,
+    def __init__(self,
             Manager=DefaultManager,
             realm='',
             request_token_path='/oauth/request_token',
-            access_token_path='/oauth/access_token'
+            access_token_path='/oauth/access_token',
+            **kwargs
         ):
 
         self.realm = realm
@@ -55,7 +56,7 @@ class OAuthPlugin(object):
         # Allow manager to be provided as an entry point from config
         if isinstance(Manager, (str, unicode)):
             Manager = _resolve(Manager)
-        self.manager = Manager(engine)
+        self.manager = Manager(**kwargs)
 
 
     def _parse_params(self, environ):
