@@ -92,7 +92,7 @@ Therefore in order to get OAuth support you need to provide it as identifier,
 authenticator and challenger to the repoze.who middleware_, similar to this
 (here we create it using repoze.what provided helper)::
 
-    >>> oauth_plugin = OAuthPlugin('sqlite:///:memory:', realm='MyRealm')
+    >>> oauth_plugin = OAuthPlugin(engine='sqlite:///:memory:', realm='MyRealm')
     >>> from repoze.what.middleware import setup_auth
     >>> app = setup_auth(my_app,
     ...     group_adapters=my_group_adapters,
@@ -105,7 +105,7 @@ authenticator and challenger to the repoze.who middleware_, similar to this
 However, usually you would use some higher level middleware maker. Let's take
 repoze.what-quickstart_ as an example::
 
-    >>> oauth_plugin = OAuthPlugin('sqlite:///:memory:', realm='MyRealm')
+    >>> oauth_plugin = OAuthPlugin(engine='sqlite:///:memory:', realm='MyRealm')
     >>> from repoze.what.plugins.quickstart import setup_sql_auth
     >>> app = setup_sql_auth(app, User, Group, Permission, Session,
     ...     identifiers=[('oauth', oauth_plugin)],
