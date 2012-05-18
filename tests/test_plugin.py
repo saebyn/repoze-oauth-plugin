@@ -737,7 +737,7 @@ class TestOAuthPlugin(ManagerTester):
         # The token_authorization predicate is supposed to protect the token
         # authorization method
         from repoze.what.plugins.oauth import token_authorization
-        authorizer = token_authorization(self.engine)
+        authorizer = token_authorization(engine=self.engine)
         authorizer.check_authorization(environ)
         # environ now stores the same token taken from the DB. And we can use
         # the information associated with that token

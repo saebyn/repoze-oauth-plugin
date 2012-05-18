@@ -198,7 +198,7 @@ class TestTokenAuthorization(BasePredicateTester):
     def test_token_authorization(self):
         r"""Test how token_authorization behaves in GET and POST requests"""
         env = self._make_environ()
-        p = token_authorization(self.engine)
+        p = token_authorization(engine=self.engine)
         session = p.manager.DBSession
 
         # First try an empty environment
