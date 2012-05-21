@@ -56,7 +56,7 @@ class OAuthPlugin(object):
         # Allow manager to be provided as an entry point from config
         if isinstance(manager, (str, unicode)):
             manager = _resolve(manager)
-        self.manager = Manager(**kwargs)
+        self.manager = manager(**kwargs)
 
 
     def _parse_params(self, environ):
