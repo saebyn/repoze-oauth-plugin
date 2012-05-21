@@ -54,8 +54,8 @@ class OAuthPlugin(object):
             access=access_token_path)
 
         # Allow manager to be provided as an entry point from config
-        if isinstance(Manager, (str, unicode)):
-            Manager = _resolve(Manager)
+        if isinstance(manager, (str, unicode)):
+            manager = _resolve(manager)
         self.manager = Manager(**kwargs)
 
 
