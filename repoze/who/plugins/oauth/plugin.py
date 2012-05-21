@@ -34,7 +34,7 @@ class OAuthPlugin(object):
     implements(IIdentifier, IAuthenticator, IChallenger)
 
     def __init__(self,
-            Manager=DefaultManager,
+            manager=DefaultManager,
             realm='',
             request_token_path='/oauth/request_token',
             access_token_path='/oauth/access_token',
