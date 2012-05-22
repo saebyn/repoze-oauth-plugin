@@ -11,6 +11,7 @@ from repoze.who.config import _resolve
 from repoze.who.interfaces import IIdentifier, IAuthenticator, IChallenger
 
 from .managers import DefaultManager
+from .signatures import SignatureMethod_RSA_SHA1
 
 
 class OAuthPlugin(object):
@@ -45,7 +46,8 @@ class OAuthPlugin(object):
         # The oauth2 server implementation to handle signatures
         self.server = oauth2.Server(signature_methods={
             # Supported signature methods
-            'HMAC-SHA1': oauth2.SignatureMethod_HMAC_SHA1()
+            'HMAC-SHA1': oauth2.SignatureMethod_HMAC_SHA1(),
+            'RSA-SHA1': SignatureMethod_RSA_SHA1(),
         })
 
         # Remember the paths to serve the tokens on
