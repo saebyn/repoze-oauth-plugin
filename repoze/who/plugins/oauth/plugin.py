@@ -70,8 +70,10 @@ class OAuthPlugin(object):
         # Authorization header
         auth_header = AUTHORIZATION(environ)
         if auth_header:
-            params.update(oauth2.Request._split_header(auth_header))
-
+            try:
+                params.update(oauth2.Request._split_header(auth_header))
+            except:
+                pass
         # Remove the non-oauth params
         if params:
             for key in params.keys():
