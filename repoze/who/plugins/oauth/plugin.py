@@ -6,6 +6,7 @@ from paste.httpexceptions import HTTPUnauthorized
 from paste.httpheaders import AUTHORIZATION, WWW_AUTHENTICATE
 from paste.request import parse_formvars, parse_querystring, construct_url
 from zope.interface import implements
+from webob import Request
 
 from repoze.who.config import _resolve
 from repoze.who.interfaces import IIdentifier, IAuthenticator, IChallenger
@@ -62,11 +63,16 @@ class OAuthPlugin(object):
 
 
     def _parse_params(self, environ):
-        # Try to find the parameters in various sources:
-        # POST body
-        params = parse_formvars(environ, include_get_vars=False)
+        # Try to find the parameters in various sources,
+        # reflecting preference order:
         # Query string
-        params.update(parse_querystring(environ))
+        params = dict(parse_querystring(environ))
+        # POST body
+        request = Request(environ)
+        if request.content_type == 'application/x-www-form-urlencoded':
+            body = request.body
+            params.update(parse_formvars(environ, include_get_vars=False))
+            request.body = body
         # Authorization header
         auth_header = AUTHORIZATION(environ)
         if auth_header:

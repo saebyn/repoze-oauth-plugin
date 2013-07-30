@@ -28,6 +28,7 @@ setup(name='repoze-oauth-plugin',
         'repoze.what>=1.0.9',
         'oauth2>=1.2.0',
         'SQLAlchemy>=0.5.5',
+        'webob',
     ],
     tests_require=[
         'nose',
