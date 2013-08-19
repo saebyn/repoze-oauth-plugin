@@ -132,7 +132,7 @@ class DefaultManager(object):
         token = tokens.first()
         return token
 
-    def set_request_token_user(self, key, userid):
+    def set_request_token_user(self, key, userid, environ):
         r"""Register the user id for this token and also generate a verification
         code."""
         token = self.get_request_token(key)
