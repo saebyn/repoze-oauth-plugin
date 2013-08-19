@@ -150,7 +150,7 @@ class OAuthPlugin(object):
         parameter. Die if unsuccessful.
         """
         consumer = self.manager.get_consumer_by_key(
-            env['identity'].get('oauth_consumer_key'))
+            env['identity'].get('oauth_consumer_key'), environ=env)
         if consumer:
             # Consumer found - remember it
             env['consumer'] = consumer
@@ -163,7 +163,7 @@ class OAuthPlugin(object):
         """
         token_key = env['identity'].get('oauth_token')
         verifier = env['identity'].get('oauth_verifier')
-        token = self.manager.get_request_token(token_key)
+        token = self.manager.get_request_token(token_key, environ=env)
         if token and verifier and token.verifier == verifier:
             # A matching token found - remember it
             env['token'] = token
@@ -175,7 +175,7 @@ class OAuthPlugin(object):
         Die if unsuccessful.
         """
         token_key = env['identity'].get('oauth_token')
-        token = self.manager.get_access_token(token_key, env['consumer'])
+        token = self.manager.get_access_token(token_key, env['consumer'], environ=env)
         if token:
             # A matching token found - remember it
             env['token'] = token
@@ -203,7 +203,7 @@ class OAuthPlugin(object):
         def token_app(environ, start_response):
             r"""Create a request token and return its attributes urlencoded"""
             token = self.manager.create_request_token(env['consumer'],
-                env['identity']['oauth_callback'])
+                env['identity']['oauth_callback'], environ=env)
             start_response('200 OK', [
                 ('Content-Type', 'application/x-www-form-urlencoded')
             ])
@@ -221,7 +221,7 @@ class OAuthPlugin(object):
             r"""Create an access token using the request token and return its
             attributes urlencoded
             """
-            atoken = self.manager.create_access_token(env.get('token'))
+            atoken = self.manager.create_access_token(env.get('token'), environ=env)
             start_response('200 OK', [
                 ('Content-Type', 'application/x-www-form-urlencoded')
             ])
