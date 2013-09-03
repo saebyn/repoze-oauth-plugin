@@ -135,7 +135,7 @@ class token_authorization(Predicate):
             self._manager = self.Manager(**self.kwargs)
         return self._manager
 
-    def _make_callback(self):
+    def _make_callback(self, environ):
         def callback_maker(token_key, userid):
             """Register the user to the request token and construct the token
             authorization parameters.
@@ -145,7 +145,7 @@ class token_authorization(Predicate):
               is not a browser)
             - url - a URL to redirect to (if the user agent is a browser)
             """
-            token = self.manager.set_request_token_user(token_key, userid)
+            token = self.manager.set_request_token_user(token_key, userid, environ=environ)
             return dict(
                 verifier=token.verifier,
                 url=token.callback_url,
@@ -172,4 +172,4 @@ class token_authorization(Predicate):
             what_env['token'] = token
         elif environ['REQUEST_METHOD'] == 'POST':
             # Just construct a callback maker and put it into environ
-            what_env['make_callback'] = self._make_callback()
+            what_env['make_callback'] = self._make_callback(environ)
