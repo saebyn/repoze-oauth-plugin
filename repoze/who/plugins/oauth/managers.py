@@ -74,20 +74,20 @@ class DefaultManager(object):
                 cascade='all, delete, delete-orphan')
 
 
-    def get_consumer_by_key(self, key):
+    def get_consumer_by_key(self, key, environ):
         r"""Fetch a consumer by the given key. None if not found"""
         cons = self.DBSession.query(self.Consumer).filter_by(key=key).first()
         return cons
 
 
-    def create_request_token(self, consumer, callback):
+    def create_request_token(self, consumer, callback, environ):
         r"""Create a new request token for the consumer and assign a callback to
         it. Use callback='oob' (out-of-band) if callback not available.
         """
         return self.RequestToken.create(consumer, callback,
             session=self.DBSession)
 
-    def create_access_token(self, rtoken):
+    def create_access_token(self, rtoken, environ):
         r"""Create a new access token using the given request token.
         The consumer and user id are copied from the request token.
         The request token is then deleted.
@@ -98,7 +98,7 @@ class DefaultManager(object):
         self.DBSession.flush()
         return atoken
 
-    def get_request_token(self, key):
+    def get_request_token(self, key, environ):
         r"""Fetch a request token by the given key. None if not found.
         If 'valid_till' is set for the token it is checked to be not earlier
         than now.
@@ -114,7 +114,7 @@ class DefaultManager(object):
         token = tokens.first()
         return token
 
-    def get_access_token(self, key, consumer):
+    def get_access_token(self, key, consumer, environ):
         r"""Fetch an access token by the given key and consumer. None if not
         found.
         If 'valid_till' is set for the token it is checked to be not earlier
@@ -132,7 +132,7 @@ class DefaultManager(object):
         token = tokens.first()
         return token
 
-    def set_request_token_user(self, key, userid):
+    def set_request_token_user(self, key, userid, environ):
         r"""Register the user id for this token and also generate a verification
         code."""
         token = self.get_request_token(key)
