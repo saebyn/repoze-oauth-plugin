@@ -27,8 +27,8 @@ setup(
     zip_safe=False,
     test_suite='nose.collector',
     dependency_links=[
-        'https://github.com/saebyn/repoze.who/tarball/f6ef4b2d946c4860cd02cf3d51c2dca611680b8f#egg=repoze.who-1.0.19-saltbox'
-    ]
+        'https://github.com/saebyn/repoze.who/tarball/f6ef4b2d946c4860cd02cf3d51c2dca611680b8f#egg=repoze.who-1.0.19-saltbox',
+    ],
     install_requires=[
         'repoze.who==1.0.19',
         'repoze.what>=1.0.9',
