@@ -30,7 +30,7 @@ setup(
         'https://github.com/saebyn/repoze.who/tarball/4007e894724e51ffd143230c736be118f30c8982#egg=repoze.who-1.0.19-saltbox',
     ],
     install_requires=[
-        'repoze.who==1.0.19-saltbox',
+        'repoze.who===1.0.19-saltbox',
         'repoze.what>=1.0.9',
         'oauth2>=1.2.0',
         'SQLAlchemy>=0.5.5',
