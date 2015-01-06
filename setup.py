@@ -6,7 +6,7 @@ import sys
 # Fool distutils to accept more than ASCII
 reload(sys).setdefaultencoding('utf-8')
 
-version = '0.3.1-saltbox'
+version = '0.3.2'
 
 setup(name='repoze-oauth-plugin',
     version=version,
