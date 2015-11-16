@@ -1,5 +1,5 @@
 import cgi
-from urllib import urlencode
+from urllib.parse import urlencode
 
 import oauth2
 from paste.httpexceptions import HTTPUnauthorized
@@ -57,7 +57,7 @@ class OAuthPlugin(object):
             access=access_token_path)
 
         # Allow manager to be provided as an entry point from config
-        if isinstance(manager, (str, unicode)):
+        if isinstance(manager, str):
             manager = _resolve(manager)
         self.manager = manager(**kwargs)
 
@@ -82,7 +82,7 @@ class OAuthPlugin(object):
                 pass
         # Remove the non-oauth params
         if params:
-            for key in params.keys():
+            for key in list(params.keys()):
                 if not (key.startswith('oauth_') or key == 'realm'):
                     del params[key]
 
@@ -113,8 +113,7 @@ class OAuthPlugin(object):
             return 'request-token'
         if path == self.paths['access']:
             return 'access-token'
-        if identity and not filter(lambda k: not k.startswith('oauth_'),
-            identity.keys()):
+        if identity and not [k for k in list(identity.keys()) if not k.startswith('oauth_')]:
             if 'oauth_token' in identity:
                 return '3-legged'
             return '2-legged'
@@ -131,7 +130,7 @@ class OAuthPlugin(object):
         # Non oauth parameter filter
         invalid_oauth = lambda k: not k.startswith('oauth_') and \
             k.lower() != 'realm'
-        if filter(invalid_oauth, env['identity'].keys()):
+        if list(filter(invalid_oauth, list(env['identity'].keys()))):
             # There are keys not from oauth - probably not our credentials yet.
             # Just ignore and exit for now
             env['throw_401'] = False
@@ -193,7 +192,7 @@ class OAuthPlugin(object):
             parameters=env['identity'])
         try:
             self.server.verify_request(req, env['consumer'], env.get('token'))
-        except oauth2.Error, e:
+        except oauth2.Error as e:
             # Verification error
             return False
         return True

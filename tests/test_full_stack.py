@@ -78,7 +78,7 @@ class TestOAuthFullStack(ManagerTester):
         res = app.get('http://localhost/secret-for-all', expect_errors=True)
         self.assertTrue('401 Unauthorized' in res)
         # We also get a WWW-Authenticate header
-        self.assertEquals(res.header('WWW-Authenticate'),
+        self.assertEqual(res.header('WWW-Authenticate'),
             'OAuth realm="OAuthRealm"')
 
         # Now create a proper request with OAuth parameters
@@ -98,7 +98,7 @@ class TestOAuthFullStack(ManagerTester):
         self.session.add(Consumer(key='app', secret='app-secret'))
         self.session.flush()
         # The new consumer was really created
-        self.assertEquals(self.plugin.manager.get_consumer_by_key('app').key,
+        self.assertEqual(self.plugin.manager.get_consumer_by_key('app').key,
             consumer.key)
 
         res = app.get(o_req.url, headers=request_header)
@@ -123,7 +123,7 @@ class TestOAuthFullStack(ManagerTester):
         self.session.add(Consumer(key='app1', secret='app1-secret'))
         self.session.flush()
         # The new consumer was created
-        self.assertEquals(self.plugin.manager.get_consumer_by_key('app1').key,
+        self.assertEqual(self.plugin.manager.get_consumer_by_key('app1').key,
             consumer1.key)
 
         # Now it should work

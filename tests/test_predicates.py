@@ -1,4 +1,4 @@
-from urllib import urlencode
+from urllib.parse import urlencode
 
 from repoze.what import predicates
 
@@ -27,8 +27,8 @@ class BasePredicateTester(ManagerTester):
             p.evaluate(environ, credentials)
             self.fail('Predicate must not be met; expected error: %s' %
                       expected_error)
-        except predicates.NotAuthorizedError, error:
-            self.assertEqual(unicode(error), expected_error)
+        except predicates.NotAuthorizedError as error:
+            self.assertEqual(str(error), expected_error)
         # Testing is_met:
         self.assertEqual(p.is_met(environ), False)
 
@@ -214,7 +214,7 @@ class TestTokenAuthorization(BasePredicateTester):
         consumer = Consumer(key='some-consumer', secret='some-secret')
         token = RequestToken.create(consumer, session=session,
             key='some-token',
-            callback=u'http://www.test.com/some/path?x=1&y=%20a')
+            callback='http://www.test.com/some/path?x=1&y=%20a')
         session.add(consumer)
         session.flush()
         # This time we are passed through
@@ -222,7 +222,7 @@ class TestTokenAuthorization(BasePredicateTester):
 
         # Environment now contains a token which was found according to the
         # query string parameters
-        self.assertEquals(env['repoze.what.oauth']['token'], token)
+        self.assertEqual(env['repoze.what.oauth']['token'], token)
 
         # Now construct a POST query and expect to find a callback function to
         # authorize the request token
@@ -234,12 +234,12 @@ class TestTokenAuthorization(BasePredicateTester):
 
         # We must provide a request token key and a userid to authorize a
         # request callback
-        callback = callback_maker('some-token', u'some-user')
-        self.assertEquals(len(callback['verifier']), 6)
+        callback = callback_maker('some-token', 'some-user')
+        self.assertEqual(len(callback['verifier']), 6)
         self.assertTrue(callback['verifier'] in callback['url'])
 
         # If the token callback url was provided as 'oob' (out of band) then the
         # callback['url'] should also specify oob
-        token.callback = u'oob'
-        callback = callback_maker('some-token', u'some-user')
-        self.assertEquals(callback['url'], 'oob')
+        token.callback = 'oob'
+        callback = callback_maker('some-token', 'some-user')
+        self.assertEqual(callback['url'], 'oob')

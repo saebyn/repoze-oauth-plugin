@@ -1,14 +1,14 @@
 import base64
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import time
 import random
-import urlparse
+import urllib.parse
 import hmac
 import binascii
 import httplib2
 
 try:
-    from urlparse import parse_qs
+    from urllib.parse import parse_qs
     parse_qs # placate pyflakes
 except ImportError:
     # fall back for Python 2.5
@@ -50,7 +50,7 @@ class SignatureMethod_RSA_SHA1(SignatureMethod):
 
     def sign(self, request, consumer, token):
         """Builds the base signature string."""
-        if RSA is None: raise NotImplementedError, self.name
+        if RSA is None: raise NotImplementedError(self.name)
         key, raw = self.signing_base(request, consumer, token)
         
         digest = sha(raw).digest()
@@ -62,7 +62,7 @@ class SignatureMethod_RSA_SHA1(SignatureMethod):
     def check(self, request, consumer, token, signature):
         """Returns whether the given signature is the correct signature for
         the given consumer and token signing the given request."""
-        if RSA is None: raise NotImplementedError, self.name
+        if RSA is None: raise NotImplementedError(self.name)
         key, raw = self.signing_base(request, consumer, token)
 
         digest = sha(raw).digest()

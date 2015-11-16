@@ -1,5 +1,5 @@
-from plugin import OAuthPlugin
+from .plugin import OAuthPlugin
 
-from managers import DefaultManager
+from .managers import DefaultManager
 
-from model import Consumer, RequestToken, AccessToken
+from .model import Consumer, RequestToken, AccessToken

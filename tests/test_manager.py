@@ -14,7 +14,7 @@ class TestOAuthDefaultManager(ManagerTester):
         manager = DefaultManager(engine=self.engine)
 
         # Consumer exists not
-        self.assertEquals(manager.get_consumer_by_key('abcd'), None)
+        self.assertEqual(manager.get_consumer_by_key('abcd'), None)
 
         # Create a sample consumer
         consumer = Consumer(key='abcd', secret='abcdef')
@@ -22,9 +22,9 @@ class TestOAuthDefaultManager(ManagerTester):
         self.session.flush()
 
         # Consumer exists
-        self.assertEquals(manager.get_consumer_by_key('abcd').key, consumer.key)
+        self.assertEqual(manager.get_consumer_by_key('abcd').key, consumer.key)
         # Consumer exists not
-        self.assertEquals(manager.get_consumer_by_key('abdc'), None)
+        self.assertEqual(manager.get_consumer_by_key('abdc'), None)
 
 
     def test_tables_and_relationships(self):
@@ -58,16 +58,16 @@ class TestOAuthDefaultManager(ManagerTester):
             # Then the tokens
             self.session.add_all((
                 RequestToken(key='token1', secret='secret1', consumer=cons1),
-                AccessToken(key='token2', secret='secret2', userid=u'some-user',
+                AccessToken(key='token2', secret='secret2', userid='some-user',
                     consumer=cons1),
-                AccessToken(key='token3', secret='secret3', userid=u'some-user',
+                AccessToken(key='token3', secret='secret3', userid='some-user',
                     consumer=cons2),
             ))
             self.session.flush()
             # We have 2 consumers and 3 tokens now
-            self.assertEquals(len(list(self.session.query(Consumer))), 2)
-            self.assertEquals(len(list(self.session.query(RequestToken))), 1)
-            self.assertEquals(len(list(self.session.query(AccessToken))), 2)
+            self.assertEqual(len(list(self.session.query(Consumer))), 2)
+            self.assertEqual(len(list(self.session.query(RequestToken))), 1)
+            self.assertEqual(len(list(self.session.query(AccessToken))), 2)
             # If the cascade=delete is defined and we remove the first consumer
             # now the two tokens belonging to it have to be autoremoved too.
             # Else, they should stay
@@ -78,9 +78,9 @@ class TestOAuthDefaultManager(ManagerTester):
             else:
                 request_tokens = 1
                 access_tokens = 2
-            self.assertEquals(len(list(self.session.query(RequestToken))),
+            self.assertEqual(len(list(self.session.query(RequestToken))),
                 request_tokens)
-            self.assertEquals(len(list(self.session.query(AccessToken))),
+            self.assertEqual(len(list(self.session.query(AccessToken))),
                 access_tokens)
             # Discard all the objects we had here
             self.session.expunge_all()
@@ -104,18 +104,18 @@ class TestOAuthDefaultManager(ManagerTester):
         self.assertTrue(hasattr(Consumer, 'version'))
         cons = self.session.query(Consumer).first()
         # Which is NULL by default
-        self.assertEquals(cons.version, None)
+        self.assertEqual(cons.version, None)
         # But we can set it
         cons.version = '1.1'
         self.session.flush()
         # And it is persisted correctly
-        self.assertEquals(self.session.query(Consumer).first().version, '1.1')
+        self.assertEqual(self.session.query(Consumer).first().version, '1.1')
 
         # Check that an access token can be (in)valid (a new attribute)
         self.assertTrue(hasattr(AccessToken, 'valid'))
         cons = self.session.query(AccessToken).first()
         # True by default
-        self.assertEquals(cons.valid, True)
+        self.assertEqual(cons.valid, True)
         cons.valid = False
         self.session.flush()
         # Also persisted correctly
@@ -182,43 +182,43 @@ class TestOAuthDefaultManager(ManagerTester):
         cons1 = Consumer(key='consumer1', secret='secret1')
         self.session.add(cons1)
 
-        req_token = RequestToken.create(cons1, u'http://someurl.com',
+        req_token = RequestToken.create(cons1, 'http://someurl.com',
             session=self.session)
         # Check various attributes and relations
-        self.assertEquals(req_token.consumer, cons1)
-        self.assertEquals(cons1.request_tokens, [req_token])
+        self.assertEqual(req_token.consumer, cons1)
+        self.assertEqual(cons1.request_tokens, [req_token])
         # We have exactly one token now
-        self.assertEquals(len(list(self.session.query(RequestToken))), 1)
-        self.assertEquals(len(req_token.key), 40)
-        self.assertEquals(len(req_token.secret), 40)
+        self.assertEqual(len(list(self.session.query(RequestToken))), 1)
+        self.assertEqual(len(req_token.key), 40)
+        self.assertEqual(len(req_token.secret), 40)
 
         # Now create an access token and also check it
-        acc_token = AccessToken.create(cons1, u'some-user',
+        acc_token = AccessToken.create(cons1, 'some-user',
             session=self.session)
-        self.assertNotEquals(acc_token.key, req_token.key)
-        self.assertEquals(cons1.access_tokens, [acc_token])
+        self.assertNotEqual(acc_token.key, req_token.key)
+        self.assertEqual(cons1.access_tokens, [acc_token])
 
         # Let's try to create two tokens with the same key and test the unique
         # key requirement
-        token1 = RequestToken.create(cons1, u'http://someurl.com', key='rtkey')
-        token2 = RequestToken.create(cons1, u'http://someurl.com', key='rtkey')
+        token1 = RequestToken.create(cons1, 'http://someurl.com', key='rtkey')
+        token2 = RequestToken.create(cons1, 'http://someurl.com', key='rtkey')
         # We do not provide the session so the exception happens on flush
         self.assertRaises(sa.exc.IntegrityError, self.session.flush)
 
         # However if we do provide the session, it will be flushed, the error
         # will be caught and the key will be changed to a random string
-        token1 = RequestToken.create(cons1, u'http://someurl.com',
+        token1 = RequestToken.create(cons1, 'http://someurl.com',
             session=self.session, key='rtkey')
-        token2 = RequestToken.create(cons1, u'http://someurl.com',
+        token2 = RequestToken.create(cons1, 'http://someurl.com',
             session=self.session, key='rtkey')
         # The first token has the provided key
-        self.assertEquals(token1.key, 'rtkey')
+        self.assertEqual(token1.key, 'rtkey')
         # The second token got a new random key as the provided one would have
         # conflicted with the token1 key
-        self.assertNotEquals(token2.key, 'rtkey')
-        self.assertEquals(len(token2.key), 40)
+        self.assertNotEqual(token2.key, 'rtkey')
+        self.assertEqual(len(token2.key), 40)
 
         # Cleanup
         self.session.delete(cons1)
-        self.assertEquals(len(list(self.session.query(RequestToken))), 0)
-        self.assertEquals(len(list(self.session.query(AccessToken))), 0)
+        self.assertEqual(len(list(self.session.query(RequestToken))), 0)
+        self.assertEqual(len(list(self.session.query(AccessToken))), 0)

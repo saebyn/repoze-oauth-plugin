@@ -1,6 +1,6 @@
 from cgi import parse_qs
-from StringIO import StringIO
-from urllib import urlencode
+from io import StringIO
+from urllib.parse import urlencode
 
 import oauth2
 
@@ -61,7 +61,7 @@ class TestOAuthPlugin(ManagerTester):
             'QUERY_STRING': pstr,
         })
         # We got out what we inputed
-        self.assertEquals(plugin._parse_params(environ), dict(params))
+        self.assertEqual(plugin._parse_params(environ), dict(params))
 
         # If we supplied some non-oauth params...
         non_oauth_params = [
@@ -75,7 +75,7 @@ class TestOAuthPlugin(ManagerTester):
             'QUERY_STRING': pstr,
         })
         # ... only oauth params would get out
-        self.assertEquals(plugin._parse_params(environ), dict(params))
+        self.assertEqual(plugin._parse_params(environ), dict(params))
 
         # Supply the same params in a POST request
         environ = self._makeEnviron({
@@ -85,7 +85,7 @@ class TestOAuthPlugin(ManagerTester):
             'wsgi.input': StringIO(pstr),
             'QUERY_STRING': '',
         })
-        self.assertEquals(plugin._parse_params(environ), dict(params))
+        self.assertEqual(plugin._parse_params(environ), dict(params))
 
         # And here pass the same params in the Authorization header
         pstr = ', '.join(['%s="%s"' % (k, v) for k, v in params])
@@ -96,7 +96,7 @@ class TestOAuthPlugin(ManagerTester):
             'HTTP_AUTHORIZATION': 'OAuth ' + pstr
         })
         # Realm is stripped if it comes through the authorization header
-        self.assertEquals(plugin._parse_params(environ), dict(params[1:]))
+        self.assertEqual(plugin._parse_params(environ), dict(params[1:]))
 
 
     def test_request_type_detector(self):
@@ -115,31 +115,31 @@ class TestOAuthPlugin(ManagerTester):
         env = self._makeEnviron(std_env_params)
         env.update({'PATH_INFO': '/somepath'})
         ident = {}
-        self.assertEquals(plugin._detect_request_type(env, ident), 'non-oauth')
+        self.assertEqual(plugin._detect_request_type(env, ident), 'non-oauth')
 
         # A simple path but with oauth consumer information
         ident = {'oauth_consumer_key': '1234'}
-        self.assertEquals(plugin._detect_request_type(env, ident), '2-legged')
+        self.assertEqual(plugin._detect_request_type(env, ident), '2-legged')
 
         # A simple path but with oauth consumer and token information
         ident = {
             'oauth_consumer_key': '1234',
             'oauth_token': 'abcd',
         }
-        self.assertEquals(plugin._detect_request_type(env, ident), '3-legged')
+        self.assertEqual(plugin._detect_request_type(env, ident), '3-legged')
 
         # A request token path (even without oauth parameters)
         env = self._makeEnviron(std_env_params)
         env.update({'PATH_INFO': '/oauth/request_token'})
         ident = {}
-        self.assertEquals(plugin._detect_request_type(env, ident),
+        self.assertEqual(plugin._detect_request_type(env, ident),
             'request-token')
 
         # An access token path (even without oauth parameters)
         env = self._makeEnviron(std_env_params)
         env.update({'PATH_INFO': '/oauth/access_token'})
         ident = {}
-        self.assertEquals(plugin._detect_request_type(env, ident),
+        self.assertEqual(plugin._detect_request_type(env, ident),
             'access-token')
 
 
@@ -152,12 +152,12 @@ class TestOAuthPlugin(ManagerTester):
         env = self._makeEnviron(std_env_params)
         env.update({'PATH_INFO': '/token'})
         ident = {}
-        self.assertEquals(plugin._detect_request_type(env, ident),
+        self.assertEqual(plugin._detect_request_type(env, ident),
             'request-token')
 
         # With token
         ident = {'oauth_token': 'abc'}
-        self.assertEquals(plugin._detect_request_type(env, ident),
+        self.assertEqual(plugin._detect_request_type(env, ident),
             'access-token')
 
 
@@ -190,17 +190,17 @@ class TestOAuthPlugin(ManagerTester):
         # An oauth parameter - ok
         env['identity']['oauth_something'] = True
         self.assertTrue(plugin._check_oauth_params(env))
-        self.assertEquals(env.get('throw_401'), None)
+        self.assertEqual(env.get('throw_401'), None)
 
         # realm is also a valid oauth parameter
         env['identity']['realm'] = 'MyRealm'
         self.assertTrue(plugin._check_oauth_params(env))
-        self.assertEquals(env.get('throw_401'), None)
+        self.assertEqual(env.get('throw_401'), None)
 
         # Not an oauth parameter - die
         env['identity']['auth_something'] = True
         self.assertFalse(plugin._check_oauth_params(env))
-        self.assertEquals(env['throw_401'], False)
+        self.assertEqual(env['throw_401'], False)
 
 
     def test_check_callback(self):
@@ -228,10 +228,10 @@ class TestOAuthPlugin(ManagerTester):
 
         # Ensure we are clean
         from repoze.who.plugins.oauth import Consumer
-        self.assertEquals(len(list(self.session.query(Consumer))), 0)
+        self.assertEqual(len(list(self.session.query(Consumer))), 0)
 
         # Create a consumer in the DB
-        consumer = Consumer(key=u'some-consumer', secret='some-secret')
+        consumer = Consumer(key='some-consumer', secret='some-secret')
         manager.DBSession.add(consumer)
         manager.DBSession.flush()
 
@@ -265,19 +265,19 @@ class TestOAuthPlugin(ManagerTester):
 
         # Ensure we are clean
         from repoze.who.plugins.oauth import Consumer
-        self.assertEquals(len(list(self.session.query(Consumer))), 0)
+        self.assertEqual(len(list(self.session.query(Consumer))), 0)
 
         # Create a consumer in the DB
-        consumer = Consumer(key=u'some-consumer', secret='some-secret')
+        consumer = Consumer(key='some-consumer', secret='some-secret')
         manager.DBSession.add(consumer)
         # Create a token and verify it for some-user
         rtoken = manager.create_request_token(consumer, 'http://test.com')
-        rtoken = manager.set_request_token_user(rtoken.key, u'some-user')
+        rtoken = manager.set_request_token_user(rtoken.key, 'some-user')
 
         # If we supply a non-existing key to set_request_token_user nothing
         # happens and we get nothing back
-        self.assertEquals(
-            manager.set_request_token_user(rtoken.key[:-2], u'some-user'), None)
+        self.assertEqual(
+            manager.set_request_token_user(rtoken.key[:-2], 'some-user'), None)
 
         # Token key and verification code provided - token found
         env = dict(environ={}, identity={
@@ -326,15 +326,15 @@ class TestOAuthPlugin(ManagerTester):
 
         # Ensure we are clean
         from repoze.who.plugins.oauth import Consumer
-        self.assertEquals(len(list(self.session.query(Consumer))), 0)
+        self.assertEqual(len(list(self.session.query(Consumer))), 0)
 
         # Create a consumer in the DB
-        consumer = Consumer(key=u'some-consumer', secret='some-secret')
+        consumer = Consumer(key='some-consumer', secret='some-secret')
         manager.DBSession.add(consumer)
         # Create a request token and verify it for some-user. The request token
         # is needed in order to create an access token
         rtoken = manager.create_request_token(consumer, 'http://test.com')
-        rtoken = manager.set_request_token_user(rtoken.key, u'some-user')
+        rtoken = manager.set_request_token_user(rtoken.key, 'some-user')
         # Now create the access token in the db
         atoken = manager.create_access_token(rtoken)
 
@@ -469,10 +469,10 @@ class TestOAuthPlugin(ManagerTester):
         r"""Test the application that creates the request token"""
         # Ensure we are clean
         from repoze.who.plugins.oauth import Consumer, RequestToken
-        self.assertEquals(len(list(self.session.query(Consumer))), 0)
+        self.assertEqual(len(list(self.session.query(Consumer))), 0)
 
         # Create a consumer in the DB
-        consumer = Consumer(key=u'some-consumer', secret='some-secret')
+        consumer = Consumer(key='some-consumer', secret='some-secret')
         self.session.add(consumer)
 
         plugin = self._makeOne()
@@ -494,10 +494,10 @@ class TestOAuthPlugin(ManagerTester):
         # Found it
         self.assertTrue(token)
         # The token secret matches
-        self.assertEquals(dec_token['oauth_token_secret'][0], token.secret)
+        self.assertEqual(dec_token['oauth_token_secret'][0], token.secret)
         # And we support the updated OAuth specification which requires callback
         # confirmation
-        self.assertEquals(dec_token['oauth_callback_confirmed'][0], 'true')
+        self.assertEqual(dec_token['oauth_callback_confirmed'][0], 'true')
 
         # Cleanup
         self.session.delete(consumer)
@@ -510,9 +510,9 @@ class TestOAuthPlugin(ManagerTester):
 
         # Ensure we are clean
         from repoze.who.plugins.oauth import Consumer, AccessToken
-        self.assertEquals(len(list(self.session.query(Consumer))), 0)
+        self.assertEqual(len(list(self.session.query(Consumer))), 0)
         # Create a consumer in the DB
-        consumer = Consumer(key=u'some-consumer', secret='some-secret')
+        consumer = Consumer(key='some-consumer', secret='some-secret')
         manager = plugin.manager
         manager.DBSession.add(consumer)
         manager.DBSession.flush()
@@ -520,7 +520,7 @@ class TestOAuthPlugin(ManagerTester):
         # Create a request token and verify it for some-user. The request token
         # is needed in order to create an access token
         rtoken = manager.create_request_token(consumer, 'oob')
-        rtoken = manager.set_request_token_user(rtoken.key, u'some-user')
+        rtoken = manager.set_request_token_user(rtoken.key, 'some-user')
 
         # The function needs nothing but the request token. And it does nothing
         # but assign the access token creation app to the environ
@@ -538,7 +538,7 @@ class TestOAuthPlugin(ManagerTester):
         # Yes, found it
         self.assertTrue(token)
         # And the token secret matches
-        self.assertEquals(dec_token['oauth_token_secret'][0], token.secret)
+        self.assertEqual(dec_token['oauth_token_secret'][0], token.secret)
 
         # Cleanup
         manager.DBSession.delete(consumer)
@@ -584,8 +584,8 @@ class TestOAuthPlugin(ManagerTester):
         userid = plugin.authenticate(environ, identity)
         # The repoze.who.userid contains the key of the consumer, so does
         # repoze.who.consumerkey
-        self.assertEquals(userid, 'consumer:%s' % consumer.key)
-        self.assertEquals(identity['repoze.who.consumerkey'], consumer.key)
+        self.assertEqual(userid, 'consumer:%s' % consumer.key)
+        self.assertEqual(identity['repoze.who.consumerkey'], consumer.key)
 
         # Now tweak some parameters and see how authenticator rejects the
         # consumer
@@ -597,7 +597,7 @@ class TestOAuthPlugin(ManagerTester):
         identity['non_oauth'] = True
         # The plugin assumes he got identity from some other identifier and
         # ignores it
-        self.assertEquals(plugin.authenticate(environ, identity), None)
+        self.assertEqual(plugin.authenticate(environ, identity), None)
 
         # Bad timestamp
         good_tstamp = req['oauth_timestamp']
@@ -606,7 +606,7 @@ class TestOAuthPlugin(ManagerTester):
         env_params.update(std_env_params)
         environ = self._makeEnviron(env_params)
         identity = plugin.identify(environ)
-        self.assertEquals(plugin.authenticate(environ, identity), None)
+        self.assertEqual(plugin.authenticate(environ, identity), None)
         # Restore the good timestamp
         req['oauth_timestamp'] = good_tstamp
 
@@ -617,7 +617,7 @@ class TestOAuthPlugin(ManagerTester):
         env_params.update(std_env_params)
         environ = self._makeEnviron(env_params)
         identity = plugin.identify(environ)
-        self.assertEquals(plugin.authenticate(environ, identity), None)
+        self.assertEqual(plugin.authenticate(environ, identity), None)
         # Restore the good signature
         req['oauth_signature'] = good_signature
 
@@ -628,7 +628,7 @@ class TestOAuthPlugin(ManagerTester):
         env_params.update(std_env_params)
         environ = self._makeEnviron(env_params)
         identity = plugin.identify(environ)
-        self.assertEquals(plugin.authenticate(environ, identity), None)
+        self.assertEqual(plugin.authenticate(environ, identity), None)
         # Restore the good consumer key
         req['oauth_consumer_key'] = good_consumer_key
 
@@ -647,7 +647,7 @@ class TestOAuthPlugin(ManagerTester):
         environ = self._makeEnviron(env_params)
         identity = plugin.identify(environ)
         userid = plugin.authenticate(environ, identity)
-        self.assertEquals(identity['consumer'].key, consumer.key)
+        self.assertEqual(identity['consumer'].key, consumer.key)
 
         # Cleanup consumers
         self.session.execute(Consumer.__table__.delete())
@@ -698,10 +698,10 @@ class TestOAuthPlugin(ManagerTester):
         # about it as the downstream application will never execute. What is
         # more important, `authenticate` replaced the downstream app with a
         # custom one.
-        self.assertEquals(userid, 'consumer:%s' % consumer.key)
+        self.assertEqual(userid, 'consumer:%s' % consumer.key)
         app = environ['repoze.who.application']
         def assertUrlEncoded(code, headers, *args):
-            self.assertEquals(dict(headers)['Content-Type'],
+            self.assertEqual(dict(headers)['Content-Type'],
                 'application/x-www-form-urlencoded')
         # The custom app will return a new request token for this consumer
         enc_token = ''.join(app(environ, assertUrlEncoded))
@@ -712,17 +712,17 @@ class TestOAuthPlugin(ManagerTester):
             secret=dec_token['oauth_token_secret'][0])
         # Check token attributes
         # Autogenerated key and secret should be 40 chars long
-        self.assertEquals(len(rtoken.key), 40)
-        self.assertEquals(len(rtoken.secret), 40)
+        self.assertEqual(len(rtoken.key), 40)
+        self.assertEqual(len(rtoken.secret), 40)
         # The plugin supports the updated OAuth specification
-        self.assertEquals(dec_token['oauth_callback_confirmed'][0], 'true')
+        self.assertEqual(dec_token['oauth_callback_confirmed'][0], 'true')
         # Such a token really exists
         dbtoken = plugin.manager.get_request_token(key=rtoken.key)
-        self.assertEquals(dbtoken.secret, rtoken.secret)
+        self.assertEqual(dbtoken.secret, rtoken.secret)
         # And it really belongs to our consumer
-        self.assertEquals(dbtoken.consumer.key, consumer.key)
+        self.assertEqual(dbtoken.consumer.key, consumer.key)
         # And the callback url was set correctly
-        self.assertEquals(dbtoken.callback, u'http://test.com/?x=2')
+        self.assertEqual(dbtoken.callback, 'http://test.com/?x=2')
 
         # Now that we have the request token we should ask the user to authorize
         # it
@@ -741,8 +741,8 @@ class TestOAuthPlugin(ManagerTester):
         authorizer.check_authorization(environ)
         # environ now stores the same token taken from the DB. And we can use
         # the information associated with that token
-        self.assertEquals(environ['repoze.what.oauth']['token'].key, rtoken.key)
-        self.assertEquals(environ['repoze.what.oauth']['token'].consumer.key,
+        self.assertEqual(environ['repoze.what.oauth']['token'].key, rtoken.key)
+        self.assertEqual(environ['repoze.what.oauth']['token'].consumer.key,
             consumer.key)
 
         # Suppose a user confirms that the consumer is legitimate and gives
@@ -756,15 +756,15 @@ class TestOAuthPlugin(ManagerTester):
         callback_maker = environ['repoze.what.oauth']['make_callback']
         # Call it providing the request token key and a userid - a callback dict
         # is returned
-        callback = callback_maker(rtoken.key, u'some-user')
+        callback = callback_maker(rtoken.key, 'some-user')
         # The autogenerated verifier should be 6 chars long
-        self.assertEquals(len(callback['verifier']), 6)
+        self.assertEqual(len(callback['verifier']), 6)
         # And normally it is included in the callback url (except for
         # out-of-band callbacks)
         self.assertTrue(callback['verifier'] in callback['url'])
         # The request token is now attached to the userid
-        self.assertEquals(environ['repoze.what.oauth']['token'].userid,
-            u'some-user')
+        self.assertEqual(environ['repoze.what.oauth']['token'].userid,
+            'some-user')
 
         # Now that we have the request token verified we can convert it to an
         # access token
@@ -791,7 +791,7 @@ class TestOAuthPlugin(ManagerTester):
         # As we are providing a request token and a verifier we should get an
         # access token in exchange.
         identity = plugin.identify(environ)
-        self.assertEquals(plugin.authenticate(environ, identity), None)
+        self.assertEqual(plugin.authenticate(environ, identity), None)
 
         # ... and we failed with the wrong verification code
         # Check that the plugin returned an Unauthorized response
@@ -833,7 +833,7 @@ class TestOAuthPlugin(ManagerTester):
 
         # If we repeat the request we get a 401 again
         identity = plugin.identify(environ)
-        self.assertEquals(plugin.authenticate(environ, identity), None)
+        self.assertEqual(plugin.authenticate(environ, identity), None)
         environ['repoze.who.application'](environ, start_401_response)
 
         # So now we have a valid access token. Let's try an authorized request
@@ -855,11 +855,11 @@ class TestOAuthPlugin(ManagerTester):
         identity = plugin.identify(environ)
         userid = plugin.authenticate(environ, identity)
         # We got a *user* id
-        self.assertEquals(userid, 'some-user')
+        self.assertEqual(userid, 'some-user')
         # Identity also contains the consumer and consumer key
-        self.assertEquals(identity['repoze.who.consumerkey'], consumer.key)
+        self.assertEqual(identity['repoze.who.consumerkey'], consumer.key)
         # And we're good to go with the downstream app
-        self.assertEquals(environ.get('repoze.who.application'), None)
+        self.assertEqual(environ.get('repoze.who.application'), None)
 
         # Cleanup consumers
         self.session.execute(Consumer.__table__.delete())

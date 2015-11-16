@@ -2,8 +2,8 @@ from cgi import parse_qs
 from datetime import datetime
 from random import choice
 from string import ascii_lowercase, ascii_letters, digits
-from urllib import urlencode
-from urlparse import urlparse, urlunparse
+from urllib.parse import urlencode
+from urllib.parse import urlparse, urlunparse
 
 import sqlalchemy as sa
 from sqlalchemy.ext.declarative import declarative_base
@@ -13,7 +13,7 @@ _Base = declarative_base()
 
 def gen_random_string(length=40, alphabet=ascii_letters + digits):
     """Generate a random string of the given length and alphabet"""
-    return ''.join([choice(alphabet) for i in xrange(length)])
+    return ''.join([choice(alphabet) for i in range(length)])
 
 
 class Consumer(_Base):
@@ -82,7 +82,7 @@ class RequestToken(_Base, Token):
     def create(cls, consumer, callback, session=None, **kwargs):
         r"""Create a request token instance and assign it to a consumer"""
         # Ensure the callback is in unicode
-        callback = unicode(callback)
+        callback = str(callback)
         return cls._create_token(consumer.request_tokens, session=session,
             callback=callback, **kwargs)
 

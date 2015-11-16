@@ -40,8 +40,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'repoze-oauth-plugin'
-copyright = u'2010, Linas Juškevičius'
+project = 'repoze-oauth-plugin'
+copyright = '2010, Linas Juškevičius'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -178,8 +178,8 @@ htmlhelp_basename = 'repoze-oauth-plugindoc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'repoze-oauth-plugin.tex', u'repoze-oauth-plugin Documentation',
-   u'Linas Juškevičius', 'manual'),
+  ('index', 'repoze-oauth-plugin.tex', 'repoze-oauth-plugin Documentation',
+   'Linas Juškevičius', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -211,6 +211,6 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'repoze-oauth-plugin', u'repoze-oauth-plugin Documentation',
-     [u'Linas Juškevičius'], 1)
+    ('index', 'repoze-oauth-plugin', 'repoze-oauth-plugin Documentation',
+     ['Linas Juškevičius'], 1)
 ]

@@ -9,7 +9,7 @@ class is_consumer(Predicate):
     behalf of itself. Note that the consumer key is *not* verified to match any
     existing consumer.
     """
-    message = u'The current user must be a consumer'
+    message = 'The current user must be a consumer'
 
     def __init__(self, consumer_key=None, *args, **kargs):
         Predicate.__init__(self, *args, **kargs)
@@ -46,7 +46,7 @@ class is_oauth_user(Predicate):
     *not* verified to match any existing user or consumer, only their existance
     is verified.
     """
-    message = u'The current user must be a consumer acting on behalf of a user'
+    message = 'The current user must be a consumer acting on behalf of a user'
 
     def __init__(self, userid=None, consumer_key=None, *args, **kargs):
         Predicate.__init__(self, *args, **kargs)
@@ -82,7 +82,7 @@ class not_oauth(Predicate):
     r"""A predicate that checks that the resource is being accessed not through
     OAuth.
     """
-    message = u'Access through OAuth forbidden'
+    message = 'Access through OAuth forbidden'
 
     def evaluate(self, environ, credentials):
         r"""Perform the actual evaluation"""
@@ -121,7 +121,7 @@ class token_authorization(Predicate):
     token_authorization takes a repoze.who oauth manager and SQLAlchemy engine
     (or engine uri string) as its initialization parameters.
     """
-    message = u'No valid matching OAuth token found'
+    message = 'No valid matching OAuth token found'
 
     def __init__(self, Manager=DefaultManager, **kwargs):
         self.kwargs = kwargs
