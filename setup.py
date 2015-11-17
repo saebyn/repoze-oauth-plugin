@@ -21,7 +21,7 @@ setup(name='repoze-oauth-plugin',
     zip_safe=False,
     test_suite='nose.collector',
     dependency_links=[
-        'https://github.com/saebyn/repoze.who/tarball/ed6d1c826786e8f2f25441df6b13b34e15367d0b#egg=repoze.who-1.0.20',
+        'https://bitbucket.org/saebyn/repoze.who/get/ed6d1c8.zip#egg=repoze.who-1.0.20',
     ],
     install_requires=[
         'repoze.who==1.0.20',
